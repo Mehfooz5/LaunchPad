@@ -1,7 +1,22 @@
 // src/components/Navbar.jsx
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // simulate login state
+
+  const handleAuthClick = () => {
+    if (isLoggedIn) {
+      // Perform logout logic here
+      setIsLoggedIn(false);
+      navigate('/');
+    } else {
+      // Perform login logic or navigate to login
+      navigate('/login');
+    }
+  };
+
   return (
     <nav className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between rounded-md">
       {/* Left Section */}
@@ -19,40 +34,24 @@ const Navbar = () => {
           <Link to="/" className="text-white font-medium hover:text-indigo-400 border-b-2 border-indigo-500 pb-1">
             Dashboard
           </Link>
-          <Link to="/signup" className="text-gray-300 hover:text-white">
-            SignUp
+          <Link to="#" className="text-gray-300 hover:text-white">
+            Name
           </Link>
-          <Link to="/login" className="text-gray-300 hover:text-white">
-            Login
+          <Link to="/explore" className="text-gray-300 hover:text-white">
+            Explore
           </Link>
         </div>
       </div>
 
       {/* Right Section */}
       <div className="flex items-center space-x-4">
-        {/* Search */}
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search"
-            className="bg-gray-800 text-sm text-gray-300 pl-10 pr-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <div className="absolute left-3 top-2.5 text-gray-400">
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Notification */}
-        <button className="text-gray-400 hover:text-white">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405M17 13V9a5 5 0 10-10 0v4L5.595 15.595M15 17v1a3 3 0 11-6 0v-1h6z" />
-          </svg>
+        {/* Auth Button */}
+        <button
+          onClick={handleAuthClick}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+        >
+          {isLoggedIn ? 'Logout' : 'Login'}
         </button>
-
-        {/* Profile Image */}
-        <img className="w-8 h-8 rounded-full" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" />
       </div>
     </nav>
   );
