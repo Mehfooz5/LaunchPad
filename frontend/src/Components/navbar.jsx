@@ -1,20 +1,11 @@
-// src/components/Navbar.jsx
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // simulate login state
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const handleAuthClick = () => {
-    if (isLoggedIn) {
-      // Perform logout logic here
-      setIsLoggedIn(false);
-      navigate('/');
-    } else {
-      // Perform login logic or navigate to login
-      navigate('/login');
-    }
+  const handleLoginClick = () => {
+    setIsDropdownVisible(!isDropdownVisible);
   };
 
   return (
@@ -45,13 +36,31 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="flex items-center space-x-4">
-        {/* Auth Button */}
-        <button
-          onClick={handleAuthClick}
+        {/* Login Button */}
+        <button 
+          onClick={handleLoginClick}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
         >
-          {isLoggedIn ? 'Logout' : 'Login'}
+          Login
         </button>
+
+        {/* Dropdown Menu */}
+        {isDropdownVisible && (
+          <div className="absolute bg-gray-800 text-white p-3 rounded-md shadow-md mt-2 right-4">
+            <Link 
+              to="/founder" 
+              className="block px-4 py-2 hover:bg-indigo-600"
+            >
+              Founder
+            </Link>
+            <Link 
+              to="/investor" 
+              className="block px-4 py-2 hover:bg-indigo-600"
+            >
+              Investor
+            </Link>
+          </div>
+        )}
       </div>
     </nav>
   );
