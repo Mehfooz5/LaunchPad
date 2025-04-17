@@ -10,8 +10,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await API.post('/login', form);
-      setMessage(res.data.message);
+      // const res = await axios.post('http://localhost:5000/api/login', formData);
+      console.log('Login successful:', res.data);
     } catch (err) {
       setMessage(err.response?.data?.message || 'Login failed');
     }

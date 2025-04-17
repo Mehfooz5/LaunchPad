@@ -2,10 +2,10 @@ import mongoose from 'mongoose';
 
 const investorSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-  organizationName: String,
-  bio: String,
-  type: { type: String, enum: ['Angel', 'VC', 'Institutional', 'Incubator', 'Other'] },
-  preferredDomain: String,
+  organizationName: {type: String, required: true},
+  bio: {type: String, required: true},
+  type: { type: String, enum: ['Angel', 'VC', 'Institutional', 'Incubator', 'Other'],required: true},
+  preferredDomain: {type: String, required: true},
   linkedin: String
 }, { timestamps: true });
 
