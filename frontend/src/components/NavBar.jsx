@@ -1,69 +1,65 @@
-import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
-  const isHome     = location.pathname === '/';
-  const isInvestor = location.pathname === '/investor-profile';
-  const isFounder  = location.pathname === '/founder-profile';
-
-  const handleLogout = () => {
-    // TODO: clear auth storage
-    navigate('/');
-  };
-
-  const handleExploreStartups = () => {
-    navigate('/explore-startups');
+  const handleLoginClick = () => {
+    setIsDropdownVisible(!isDropdownVisible);
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 px-6 py-4 flex justify-between items-center">
-      {/* Logo Always */}
-      <Link to="/" className="text-2xl font-bold">
-        🚀 LaunchPad
-      </Link>
+    <nav className="bg-gray-900 text-white px-4 py-3 flex items-center justify-between rounded-md">
+      {/* Left Section */}
+      <div className="flex items-center space-x-8">
+        {/* Logo */}
+        <div className="flex items-center space-x-2">
+          <svg className="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a8 8 0 00-8 8 8 8 0 0016 0A8 8 0 0010 2z"></path>
+          </svg>
+          <span className="font-semibold text-white text-lg">LaunchPad</span>
+        </div>
 
-      {/* Right-hand buttons */}
-      <div className="flex gap-4">
-        {isHome && (
-          <Link to="/login">
-            <button className="text-blue-600 hover:underline">Login</button>
+        {/* Nav Links */}
+        <div className="hidden md:flex space-x-6">
+          <Link to="/" className="text-white font-medium hover:text-indigo-400 border-b-2 border-indigo-500 pb-1">
+            Dashboard
           </Link>
-        )}
+          <Link to="#" className="text-gray-300 hover:text-white">
+            Name
+          </Link>
+          <Link to="/explore" className="text-gray-300 hover:text-white">
+            Explore
+          </Link>
+        </div>
+      </div>
 
-        {isInvestor && (
-          <>
-            <button
-              onClick={handleExploreStartups}
-              className="text-blue-600 hover:underline"
-            >
-              Explore Startups
-            </button>
-            <button
-              onClick={handleLogout}
-              className="text-red-600 hover:underline"
-            >
-              Logout
-            </button>
-          </>
-        )}
+      {/* Right Section */}
+      <div className="flex items-center space-x-4">
+        {/* Login Button */}
+        <button 
+          onClick={handleLoginClick}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+        >
+          Login
+        </button>
 
-        {isFounder && (
-          <>
-            <Link to="/founder-profile-startup">
-              <button className="text-blue-600 hover:underline">
-                Add Startup
-              </button>
+        {/* Dropdown Menu */}
+        {isDropdownVisible && (
+          <div className="absolute bg-gray-800 text-white p-3 rounded-md shadow-md mt-2 right-4">
+            <Link 
+              to="/founder" 
+              className="block px-4 py-2 hover:bg-indigo-600"
+            >
+              Founder
             </Link>
-            <button
-              onClick={handleLogout}
-              className="text-red-600 hover:underline"
+            <Link 
+              to="/investor" 
+              className="block px-4 py-2 hover:bg-indigo-600"
             >
-              Logout
-            </button>
-          </>
+              Investor
+            </Link>
+          </div>
         )}
       </div>
     </nav>
