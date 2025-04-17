@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import API from '../api/API'; // make sure this path is correct based on your folder structure
+import API from '../api/axios'; // make sure this path is correct based on your folder structure
 
 const Navbar = () => {
   const location = useLocation();
