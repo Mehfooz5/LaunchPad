@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import API from '../api/axios'; // adjust path if different
 
-const RegisterPage = () => {
+const SignUp = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -21,22 +21,25 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
+    setError('');
+    setSuccessMessage('');
 
     try {
-      // const response = await axios.post('/api/register', formData);
+      const response = await API.post('/signup', formData);
+      setSuccessMessage('Registration successful! Redirecting...');
 
-      setSuccessMessage('Registration successful! Now proceed with your next steps.');
-      setIsProcessing(false);
-
-      // Proceed with the next steps based on the role
-      if (formData.role === 'founder') {
-        window.location.href = '/signup-founder'; 
-      } else if (formData.role === 'investor') {
-        window.location.href = '/signup-investor';
-      }
+      // Redirect based on role
+      setTimeout(() => {
+        if (formData.role === 'founder') {
+          window.location.href = '/signup-founder';
+        } else {
+          window.location.href = '/signup-investor';
+        }
+      }, 1000);
     } catch (err) {
-      setIsProcessing(false);
       setError(err?.response?.data?.message || 'Something went wrong');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -126,4 +129,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default SignUp;

@@ -123,24 +123,24 @@ const navigate = useNavigate();
           <div className="mb-4">
             <label className="block font-medium">Startup PDF URL</label>
             <input
-              type="url"
+              type="file"
               name="startupPdf"
               value={formData.startupPdf}
               onChange={handleChange}
               className="w-full border px-4 py-2 rounded mt-1"
-              placeholder="https://your-startup-pdf-link"
+              placeholder="upload file"
             />
           </div>
 
           <div className="mb-6">
             <label className="block font-medium">Pitch (YouTube/Drive link)</label>
             <input
-              type="url"
+              type="file"
               name="pitch"
               value={formData.pitch}
               onChange={handleChange}
               className="w-full border px-4 py-2 rounded mt-1"
-              placeholder="https://pitch-link"
+              placeholder="upload video"
             />
           </div>
 

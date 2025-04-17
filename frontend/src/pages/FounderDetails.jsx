@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/axios'; // adjust path if needed
 
 const SignupFounder = () => {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ const SignupFounder = () => {
     companyName: '',
     bio: '',
     websiteUrl: '',
-    verifyFounder: 'gstin',
+    BussinessNumber: '',
   });
 
   const [successMessage, setSuccessMessage] = useState('');
@@ -27,13 +27,16 @@ const SignupFounder = () => {
     setSuccessMessage('');
 
     try {
-      // await axios.post('/api/founder-details', formData);
+      const response = await API.post('/createFounderProfile', formData);
 
-      setSuccessMessage('Founder details submitted successfully!');
-      // Redirect to founder profile (dashboard)
-      navigate('/founder-profile');
+      if (response.status === 200 || response.status === 201) {
+        setSuccessMessage('Founder details submitted successfully!');
+        navigate('/founder-profile');
+      } else {
+        setError('Unexpected response from the server.');
+      }
     } catch (err) {
-      setError(err?.response?.data?.message || 'Something went wrong.');
+      setError(err?.response?.data?.message || 'Failed to submit founder details.');
     } finally {
       setIsSubmitting(false);
     }
@@ -86,17 +89,15 @@ const SignupFounder = () => {
         </div>
 
         <div className="mb-4">
-          <label className="block text-gray-700 font-medium">Verification Type</label>
-          <select
-            name="verifyFounder"
-            value={formData.verifyFounder}
+          <label className="block text-gray-700 font-medium">Business Number</label>
+          <input
+            type="text"
+            name="BussinessNumber"
+            value={formData.BussinessNumber}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg mt-1"
-            required
-          >
-            <option value="gstin">GSTIN</option>
-            <option value="adhar">Adhar</option>
-          </select>
+            placeholder="e.g. +1234567890"
+          />
         </div>
 
         <button

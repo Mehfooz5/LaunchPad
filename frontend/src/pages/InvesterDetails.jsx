@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api/axios'; // adjust the path if needed
 
 const SignupInvestor = () => {
   const navigate = useNavigate();
@@ -28,11 +28,14 @@ const SignupInvestor = () => {
     setSuccessMessage('');
 
     try {
-      // await axios.post('/api/investor-details', formData);
+      const response = await API.post('/createInvestorProfile', formData);
 
-      setSuccessMessage('Investor details submitted successfully!');
-      // Redirect to investor profile
-      navigate('/investor-profile');
+      if (response.status === 200 || response.status === 201) {
+        setSuccessMessage('Investor details submitted successfully!');
+        navigate('/investor-profile');
+      } else {
+        setError('Unexpected server response.');
+      }
     } catch (err) {
       setError(err?.response?.data?.message || 'Something went wrong.');
     } finally {
