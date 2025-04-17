@@ -16,9 +16,8 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5000/api/login', formData);
+      // const res = await axios.post('http://localhost:5000/api/login', formData);
       console.log('Login successful:', res.data);
-      // Redirect or store token as needed
     } catch (err) {
       console.error('Login failed:', err.response?.data || err.message);
     }
