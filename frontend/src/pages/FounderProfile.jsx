@@ -9,7 +9,7 @@ const FounderProfile = () => {
   };
 
   const handleLogout = () => {
-    // Clear auth data if using localStorage/session
+    // Clear auth data if needed (like localStorage/session)
     navigate('/');
   };
 
