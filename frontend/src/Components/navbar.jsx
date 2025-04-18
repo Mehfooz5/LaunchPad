@@ -9,6 +9,7 @@ const Navbar = () => {
   const isHome = location.pathname === '/';
   const isInvestor = location.pathname === '/investor-profile';
   const isFounder = location.pathname === '/founder-profile';
+  const isAboutUs = location.pathname === '/about-us';
 
   const handleLogout = async () => {
     try {
@@ -84,6 +85,21 @@ const Navbar = () => {
             >
               Logout
             </button>
+          </>
+        )}
+
+        {isAboutUs && (
+          <>
+            <Link to="/">
+            <button className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">
+              Home
+            </button>
+            </Link>
+            <Link to="/login">
+            <button className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">
+              Login
+            </button>
+            </Link>
           </>
         )}
       </div>
