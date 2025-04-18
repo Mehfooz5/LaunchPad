@@ -1,24 +1,37 @@
 import { Startup } from '../models/Startup.js';
 import { Founder } from '../models/Founder.js';
+import cloudinary from '../utils/cloudinary.js'; // Import Cloudinary configuration
 
 // @desc Create startup profile
 // @route POST /api/startup
 export const createStartupProfile = async (req, res) => {
   const { title, domain, stage, location, description } = req.body;
-  const startupPdf = req.file ? req.file.path : null; // Get the uploaded PDF file path
-  const pitch = req.files && req.files.pitch ? req.files.pitch[0].path : null; // Get uploaded MP4 file path (pitch video)
+
+  // Handle PDF file upload (if any)
+  const startupPdf = req.file ? req.file.path : null;
+
+  // Handle pitch video upload to Cloudinary
+  let pitchUrl = null;
+  if (req.files && req.files.pitch) {
+    try {
+      // Upload pitch video to Cloudinary
+      const result = await cloudinary.uploader.upload(req.files.pitch[0].path, {
+        resource_type: 'video', // Specify that it's a video file
+      });
+      pitchUrl = result.secure_url; // Store the secure URL from Cloudinary
+    } catch (error) {
+      return res.status(500).json({ message: 'Error uploading pitch video to Cloudinary', error: error.message });
+    }
+  }
 
   try {
-    if (req.user.role !== 'founder') {
-      return res.status(403).json({ message: 'Only founders can create a startup profile' });
-    }
-
     // Ensure that the user is associated with a founder profile
     const founder = await Founder.findOne({ userId: req.user._id });
     if (!founder) {
       return res.status(404).json({ message: 'Founder profile not found' });
     }
 
+    // Create new startup profile
     const startup = new Startup({
       founderId: founder._id,
       title,
@@ -26,8 +39,8 @@ export const createStartupProfile = async (req, res) => {
       stage,
       location,
       description,
-      startupPdf, // Store the PDF file path in the database
-      pitch, // Store the MP4 file path (pitch video) in the database
+      startupPdf, // Store the PDF file path (or Cloudinary URL if uploaded there)
+      pitch: pitchUrl, // Store the Cloudinary URL for pitch video
     });
 
     await startup.save();
@@ -41,6 +54,7 @@ export const createStartupProfile = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
 
 
 // @desc Get current startup profile
