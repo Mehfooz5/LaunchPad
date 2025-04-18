@@ -12,15 +12,17 @@ import InvestorProfile from './pages/InvestorProfile';
 import ExploreStartups from './pages/ExploreStartups';
 import AddStartup from './pages/AddStartup';
 import AboutUs from './pages/AboutUs';
+import ProtectedRoute from './Components/ProtectedRoute'; // 🔒 import this
 
 function App() {
   const location = useLocation();
 
   return (
     <div>
-      {/* Display Navbar only on Home Page */}
+      {/* Show special navbar only on home */}
       {location.pathname === '/' && <Navbar showLoginButton={true} />}
       <Navbar />
+
       {/* Routes */}
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -28,10 +30,34 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup-founder" element={<FounderDetails />} />
         <Route path="/signup-investor" element={<InvesterDetails />} />
-        <Route path="/founder-profile" element={<FounderProfile />} />
-        <Route path="/investor-profile" element={<InvestorProfile />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/founder-profile"
+          element={
+            <ProtectedRoute>
+              <FounderProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor-profile"
+          element={
+            <ProtectedRoute>
+              <InvestorProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-startup"
+          element={
+            <ProtectedRoute>
+              <AddStartup />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/explore-startups" element={<ExploreStartups />} />
-        <Route path="/add-startup" element={<AddStartup />} />
         <Route path="/about-us" element={<AboutUs />} />
       </Routes>
 
