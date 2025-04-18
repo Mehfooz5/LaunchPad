@@ -2,7 +2,7 @@ import express from 'express';
 import { verifyToken } from '../middlewares/auth.middleware.js';
 import { createFounderProfile, getMyFounderProfile, updateFounderProfile } from '../controllers/founder.controller.js';
 import { createInvestorProfile, getMyInvestorProfile, updateInvestorProfile } from '../controllers/investor.controller.js';
-import { createStartupProfile } from '../controllers/startup.controller.js';
+import { createStartupProfile, getMyStartupProfile } from '../controllers/startup.controller.js';
 import { upload } from '../utils/multerConfig.js';
 
 const router = express.Router();
@@ -24,5 +24,7 @@ router.post('/startup', upload.fields([
   { name: 'startupPdf', maxCount: 1 },
   { name: 'pitch', maxCount: 1 }
 ]),verifyToken, createStartupProfile);
+
+router.get('/getMyStartupProfile', verifyToken, getMyStartupProfile);
 
 export default router;
