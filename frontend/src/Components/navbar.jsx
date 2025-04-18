@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import API from '../api/axios'; // make sure this path is correct based on your folder structure
+import API from '../api/axios';
 
 const Navbar = () => {
   const location = useLocation();
@@ -12,15 +12,8 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      // Optional: Hit logout endpoint (if your backend supports it)
-      await API.get('/logout');
-
-      // Clear auth-related storage
-      localStorage.removeItem('token');
-      localStorage.removeItem('user'); // adjust key if different
-      localStorage.clear(); // or use this to wipe all if needed
-
-      // Navigate back to homepage
+      await API.post('/logout');
+      localStorage.clear();
       navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -31,32 +24,46 @@ const Navbar = () => {
     navigate('/explore-startups');
   };
 
+  const handleAddStartup = () => {
+    navigate('/add-startup');
+  };
+
   return (
-    <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-teal-200 to-purple-300 shadow-md z-50 px-6 py-4 flex justify-between items-center">
-      {/* Logo Always */}
-      <Link to="/" className="text-2xl font-bold">
-        🚀 LaunchPad
+    <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-[#00c6ff] to-[#0072ff] shadow-lg z-50 px-8 py-4 flex justify-between items-center backdrop-blur-sm">
+      {/* Logo */}
+      <Link to="/" className="text-3xl font-extrabold text-white tracking-wide hover:scale-105 transition-transform duration-200">
+        🚀 Launch<span className="text-yellow-300">Pad</span>
       </Link>
 
-      {/* Right-hand buttons */}
-      <div className="flex gap-4">
+      {/* Buttons */}
+      <div className="flex gap-4 items-center">
         {isHome && (
-          <Link to="/login">
-            <button className="text-blue-600 hover:underline">Login</button>
+          <>
+          <Link to="/about-us">
+            <button className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">
+              AboutUs
+            </button>
           </Link>
+          <Link to="/login">
+            <button className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition">
+              Login
+            </button>
+          </Link>
+        </>
+          
         )}
 
         {isInvestor && (
           <>
             <button
               onClick={handleExploreStartups}
-              className="text-blue-600 hover:underline"
+              className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-blue-100 transition"
             >
               Explore Startups
             </button>
             <button
               onClick={handleLogout}
-              className="text-red-600 hover:underline"
+              className="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-red-700 transition"
             >
               Logout
             </button>
@@ -65,14 +72,15 @@ const Navbar = () => {
 
         {isFounder && (
           <>
-            <Link to="/add-startup">
-              <button className="text-blue-600 hover:underline">
-                Add Startup
-              </button>
-            </Link>
+            <button
+              onClick={handleAddStartup}
+              className="bg-white text-purple-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-purple-100 transition"
+            >
+              Add Startup
+            </button>
             <button
               onClick={handleLogout}
-              className="text-red-600 hover:underline"
+              className="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-red-700 transition"
             >
               Logout
             </button>

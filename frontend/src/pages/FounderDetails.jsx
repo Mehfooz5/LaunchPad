@@ -43,71 +43,82 @@ const SignupFounder = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-lg mt-10">
-      <h2 className="text-2xl font-bold text-center mb-6">Founder Details</h2>
+    <div className="min-h-screen mt-12 flex items-center justify-center bg-gradient-to-br from-indigo-700 via-purple-600 to-pink-500 px-4 py-10">
+      <div className="bg-white/10 backdrop-blur-md shadow-xl rounded-xl w-full max-w-lg p-8 border border-white/20 text-white">
+        <h2 className="text-3xl font-bold text-center mb-6">Founder Details</h2>
 
-      {successMessage && <div className="text-green-600 mb-4">{successMessage}</div>}
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+        {/* Success or Error Message */}
+        {successMessage && (
+          <div className="bg-green-500/10 text-green-200 border border-green-300 px-4 py-2 rounded mb-4 text-center">
+            {successMessage}
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-500/10 text-red-200 border border-red-300 px-4 py-2 rounded mb-4 text-center">
+            {error}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium">Company Name</label>
-          <input
-            type="text"
-            name="companyName"
-            value={formData.companyName}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg mt-1"
-            placeholder="e.g. Startup Inc."
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block mb-1">Company Name</label>
+            <input
+              type="text"
+              name="companyName"
+              value={formData.companyName}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="e.g. Startup Inc."
+            />
+          </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium">Bio</label>
-          <textarea
-            name="bio"
-            value={formData.bio}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg mt-1"
-            rows="4"
-            placeholder="Tell us about your startup..."
-            required
-          />
-        </div>
+          <div>
+            <label className="block mb-1">Bio</label>
+            <textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              rows="4"
+              placeholder="Tell us about your startup..."
+            />
+          </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium">Website URL</label>
-          <input
-            type="url"
-            name="websiteUrl"
-            value={formData.websiteUrl}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg mt-1"
-            placeholder="https://yourstartup.com"
-          />
-        </div>
+          <div>
+            <label className="block mb-1">Website URL</label>
+            <input
+              type="url"
+              name="websiteUrl"
+              value={formData.websiteUrl}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="https://yourstartup.com"
+            />
+          </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium">Business Number</label>
-          <input
-            type="text"
-            name="BussinessNumber"
-            value={formData.BussinessNumber}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg mt-1"
-            placeholder="e.g. +1234567890"
-          />
-        </div>
+          <div>
+            <label className="block mb-1">Business Number</label>
+            <input
+              type="text"
+              name="BussinessNumber"
+              value={formData.BussinessNumber}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="e.g. +1234567890"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit Founder Details'}
-        </button>
-      </form>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-yellow-400 text-black font-semibold py-2 rounded-lg hover:bg-yellow-300 transition mt-4 shadow-lg"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Founder Details'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

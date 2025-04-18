@@ -55,11 +55,6 @@ function Home() {
           <h2 className="text-2xl sm:text-3xl font-semibold max-w-2xl">
             We connect business ideas and opportunities with professional, technical, and creative service providers who want to invest skills and resources to make them fly.
           </h2>
-          <div className="flex gap-4 mt-6">
-            <button className="bg-white text-black px-4 py-2 rounded hover:bg-gray-200 transition">
-              Subscribe For Updates
-            </button>
-          </div>
         </div>
       </div>
 

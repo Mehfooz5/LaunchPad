@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import API from '../api/axios'; // adjust path if different
+import API from '../api/axios';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -28,14 +28,13 @@ const SignUp = () => {
       const response = await API.post('/signup', formData);
       setSuccessMessage('Registration successful! Redirecting...');
 
-      // Redirect based on role
       setTimeout(() => {
         if (formData.role === 'founder') {
           window.location.href = '/signup-founder';
-        } else {
+        } else if (formData.role === 'investor') {
           window.location.href = '/signup-investor';
         }
-      }, 1000);
+      }, 1200);
     } catch (err) {
       setError(err?.response?.data?.message || 'Something went wrong');
     } finally {
@@ -44,87 +43,96 @@ const SignUp = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
+    <div className="min-h-screen mt-10 flex items-center justify-center bg-gradient-to-br from-indigo-700 via-purple-600 to-pink-500 px-4 py-10">
+      <div className="bg-white/10 backdrop-blur-md shadow-xl rounded-xl w-full max-w-lg p-8 border border-white/20 text-white">
+        <h2 className="text-3xl font-bold text-center mb-6">Create Your Account 🎉</h2>
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      {successMessage && <div className="text-green-500 mb-4">{successMessage}</div>}
+        {error && (
+          <div className="bg-red-500/10 text-red-200 border border-red-300 px-4 py-2 rounded mb-4 text-center">
+            {error}
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-green-500/10 text-green-200 border border-green-300 px-4 py-2 rounded mb-4 text-center">
+            {successMessage}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="fullName" className="block text-gray-700">Full Name</label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg mt-2"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block mb-1">Full Name</label>
+            <input
+              type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="John Doe"
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg mt-2"
-          />
-        </div>
+          <div>
+            <label className="block mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="you@example.com"
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-700">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg mt-2"
-          />
-        </div>
+          <div>
+            <label className="block mb-1">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="••••••••"
+            />
+          </div>
 
-        <div className="mb-4">
-          <label htmlFor="role" className="block text-gray-700">Role</label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg mt-2"
+          <div>
+            <label className="block mb-1">Role</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none focus:ring-2 focus:ring-pink-300"
+            >
+              <option className="text-black" value="founder">Founder</option>
+              <option className="text-black" value="investor">Investor</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block mb-1">Contact Number</label>
+            <input
+              type="text"
+              name="contactNo"
+              value={formData.contactNo}
+              onChange={handleChange}
+              className="w-full px-4 py-2 rounded-lg bg-white/20 placeholder-white/60 text-white outline-none focus:ring-2 focus:ring-pink-300"
+              placeholder="+91 000 000 0000"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isProcessing}
+            className="w-full bg-yellow-400 text-black font-semibold py-2 rounded-lg hover:bg-yellow-300 transition mt-4 shadow-lg"
           >
-            <option value="founder">Founder</option>
-            <option value="investor">Investor</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="contactNo" className="block text-gray-700">Contact Number</label>
-          <input
-            type="text"
-            id="contactNo"
-            name="contactNo"
-            value={formData.contactNo}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-lg mt-2"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg mt-4 hover:bg-blue-700 transition"
-          disabled={isProcessing}
-        >
-          {isProcessing ? 'Processing...' : 'Register'}
-        </button>
-      </form>
+            {isProcessing ? 'Processing...' : 'Register'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

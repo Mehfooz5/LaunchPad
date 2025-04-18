@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../api/axios'; // adjust path based on your structure
+import API from '../api/axios'; // Adjust as needed
+import { FaEnvelope, FaLock } from 'react-icons/fa';
 
-function Login() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
+const Login = () => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -21,13 +18,11 @@ function Login() {
     setError('');
 
     try {
-      const res = await API.post('/login', formData); // Using the custom axios instance
+      const res = await API.post('/login', formData);
       const { token, role } = res.data;
 
-      // Store token (if using localStorage)
       localStorage.setItem('token', token);
 
-      // Redirect based on user type
       if (role === 'founder') {
         navigate('/founder-profile');
       } else if (role === 'investor') {
@@ -42,49 +37,68 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-700 via-blue-600 to-teal-600 px-4 py-10">
+      <div className="bg-white/10 backdrop-blur-md shadow-2xl rounded-xl w-full max-w-md p-8 border border-white/20">
+        <h2 className="text-3xl font-extrabold text-white text-center mb-6 drop-shadow">
+          Welcome Back 🚀
+        </h2>
 
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {error && (
+          <p className="text-red-300 bg-red-100 bg-opacity-20 text-center py-2 rounded mb-4">
+            {error}
+          </p>
+        )}
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            name="email"
-            required
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="text-white block mb-1">Email</label>
+            <div className="flex items-center bg-white/20 rounded px-3 py-2">
+              <FaEnvelope className="text-white mr-2" />
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                className="bg-transparent outline-none text-white placeholder-white/60 flex-1"
+              />
+            </div>
+          </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Password</label>
-          <input
-            type="password"
-            name="password"
-            required
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+          <div>
+            <label className="text-white block mb-1">Password</label>
+            <div className="flex items-center bg-white/20 rounded px-3 py-2">
+              <FaLock className="text-white mr-2" />
+              <input
+                type="password"
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className="bg-transparent outline-none text-white placeholder-white/60 flex-1"
+              />
+            </div>
+          </div>
 
-        <p className="mb-4">
-          Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign Up</a>
-        </p>
+          <div className="text-sm text-white/80">
+            Don't have an account?{' '}
+            <a href="/signup" className="text-yellow-300 hover:underline font-medium">
+              Sign Up
+            </a>
+          </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
-        >
-          Login
-        </button>
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-yellow-400 text-black font-semibold py-2 rounded-lg hover:bg-yellow-300 transition shadow-lg"
+          >
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
 
 export default Login;

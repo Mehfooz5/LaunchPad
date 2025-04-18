@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './components/NavBar';
+import Navbar from './components/navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
@@ -11,6 +11,7 @@ import FounderProfile from './pages/FounderProfile';
 import InvestorProfile from './pages/InvestorProfile';
 import ExploreStartups from './pages/ExploreStartups';
 import AddStartup from './pages/AddStartup';
+import AboutUs from './pages/AboutUs';
 
 function App() {
   const location = useLocation();
@@ -31,6 +32,7 @@ function App() {
         <Route path="/investor-profile" element={<InvestorProfile />} />
         <Route path="/explore-startups" element={<ExploreStartups />} />
         <Route path="/add-startup" element={<AddStartup />} />
+        <Route path="/about-us" element={<AboutUs />} />
       </Routes>
 
       {/* Footer */}
