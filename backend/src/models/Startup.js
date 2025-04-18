@@ -10,7 +10,9 @@ const startupSchema = new mongoose.Schema({
   startupPdf: String,
   pitch: String,
   likes: { type: Number, default: 0 },
-  dislikes: { type: Number, default: 0 }
+  dislikes: { type: Number, default: 0 },
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Track users who liked the startup
+  dislikedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Track users who disliked the startup
 }, { timestamps: true });
 
 export const Startup = mongoose.model('Startup', startupSchema);
