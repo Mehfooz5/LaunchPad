@@ -104,7 +104,17 @@ export const updateStartupProfile = async (req, res) => {
 // @route GET /api/startups
 export const getAllStartups = async (req, res) => {
   try {
-    const startups = await Startup.find().populate('founderId', 'companyName bio');
+    // const startups = await Startup.find().populate('founderId', 'companyName bio');
+    const startups = await Startup.find()
+    .populate('founderId', 'companyName bio')
+    .populate({
+    path: 'founderId',
+    populate: {
+      path: 'userId',
+      select: 'fullName'
+    }
+    });
+
     return res.status(200).json(startups);
   } catch (error) {
     console.error('Error in getAllStartups:', error);
