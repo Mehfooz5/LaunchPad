@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import API from '../api/axios';
 
 const FounderProfile = () => {
   const [startups, setStartups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStartups = async () => {
       try {
         const res = await API.get('/getMyStartupProfile');
         setStartups(res.data);
-        console.log('Startups:', res.data);
       } catch (err) {
         setError('Failed to load startups');
       } finally {
@@ -21,6 +22,10 @@ const FounderProfile = () => {
 
     fetchStartups();
   }, []);
+
+  const handleEdit = (startupId) => {
+    navigate(`/update-startup/${startupId}`);
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-6 mt-20">
@@ -35,9 +40,9 @@ const FounderProfile = () => {
           <p className="text-gray-700">You haven’t added any startups yet.</p>
         ) : (
           <div className="space-y-6">
-            {startups.map((startup, index) => (
+            {startups.map((startup) => (
               <div
-                key={startup._id || index}
+                key={startup._id}
                 className="border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm"
               >
                 <h3 className="text-xl font-semibold">{startup.title}</h3>
@@ -53,7 +58,7 @@ const FounderProfile = () => {
                     <p>
                       <strong>Pitch Video:</strong>{' '}
                       <a
-                        href={`/${startup.pitch}`}
+                        href={startup.pitch}
                         className="text-blue-500 underline"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -68,6 +73,13 @@ const FounderProfile = () => {
                     <p><strong>Bio:</strong> {startup.founderId?.bio || 'N/A'}</p>
                   </div>
                 </div>
+
+                <button
+                  onClick={() => handleEdit(startup._id)}
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                  Edit Startup
+                </button>
               </div>
             ))}
           </div>

@@ -10,6 +10,8 @@ import InvesterDetails from './pages/InvesterDetails';
 import FounderProfile from './pages/FounderProfile';
 import InvestorProfile from './pages/InvestorProfile';
 import ExploreStartups from './pages/ExploreStartups';
+import UpdateStartup from './pages/UpdateStartup';
+import StartupDetail from './pages/StartupDetail';
 import AddStartup from './pages/AddStartup';
 import AboutUs from './pages/AboutUs';
 import ProtectedRoute from './Components/ProtectedRoute'; // 🔒 import this
@@ -56,7 +58,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route path="/update-startup/:startupId"
+         element={
+          <ProtectedRoute>
+            <UpdateStartup />
+          </ProtectedRoute>
+          } />
+        
+        <Route path="/startup/:startupId" element={<StartupDetail />} />
         <Route path="/explore-startups" element={<ExploreStartups />} />
         <Route path="/about-us" element={<AboutUs />} />
       </Routes>
