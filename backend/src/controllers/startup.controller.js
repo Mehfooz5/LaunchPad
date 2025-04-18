@@ -52,7 +52,7 @@ export const getMyStartupProfile = async (req, res) => {
       return res.status(404).json({ message: 'Founder profile not found' });
     }
 
-    const startup = await Startup.findOne({ founderId: founder._id }).populate('founderId', 'companyName bio');
+    const startup = await Startup.find({ founderId: founder._id }).populate('founderId', 'companyName bio');
     if (!startup) {
       return res.status(404).json({ message: 'Startup profile not found' });
     }
