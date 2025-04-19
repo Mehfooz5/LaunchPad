@@ -16,7 +16,8 @@ import ChatPage from './pages/ChatPage';
 import FounderDMPage from './pages/FounderDMPage';
 import AddStartup from './pages/AddStartup';
 import AboutUs from './pages/AboutUs';
-import ProtectedRoute from './Components/ProtectedRoute'; // 🔒 import this
+import ProtectedRoute from './Components/ProtectedRoute'; 
+import ChatBot from './pages/ChatBot'; // Import the ChatBot component
 
 function App() {
   const location = useLocation();
@@ -71,6 +72,7 @@ function App() {
         <Route path="/startup/:startupId" element={<StartupDetail />} />
         <Route path="/explore-startups" element={<ExploreStartups />} />
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/chatbot" element={<ChatBot />} /> 
       </Routes>
 
       {/* Footer */}
