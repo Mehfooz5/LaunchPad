@@ -5,6 +5,7 @@ import { createInvestorProfile, getMyInvestorProfile, updateInvestorProfile } fr
 import { createStartupProfile, dislikeStartup, getAllStartups, getMyStartupProfile, getStartupById, likeStartup, updateStartupProfile } from '../controllers/startup.controller.js';
 import { upload } from '../utils/multerConfig.js';
 import { getStats } from '../controllers/stats.controller.js';
+import { createComment, getComments, addReply } from '../controllers/comment.controller.js';
 
 const router = express.Router();
 router.get('/stats', getStats);
@@ -18,6 +19,9 @@ router.post('/createInvestorProfile', verifyToken, createInvestorProfile);
 router.get('/getMyInvestorProfile', verifyToken, getMyInvestorProfile);
 router.put('/updateInvestorProfile', verifyToken, updateInvestorProfile);
 
+router.post('/comments', verifyToken, createComment);
+router.get('/comments/:startupId', verifyToken, getComments);
+router.post('/comments/:commentId/reply', verifyToken, addReply);
 // routes/startupRoutes.js
 
 // Route to create a startup profile with file uploads
@@ -28,23 +32,7 @@ router.post('/startup', upload.fields([
   { name: 'pitch', maxCount: 1 }
 ]),verifyToken, createStartupProfile);
 
-router.get('/stats', async (req, res) => {
-  try {
-    const totalStartups = await Startup.countDocuments();
-    const totalInvestors = await Investor.countDocuments();
-    
-    // Count total pitch videos by checking non-null pitch fields
-    const totalPitches = await Startup.countDocuments({ pitch: { $ne: null } });
 
-    res.json({
-      totalStartups,
-      totalPitches,
-      totalInvestors
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching statistics', error: error.message });
-  }
-});
 
 router.get('/getStartups', verifyToken, getAllStartups); // Get current startup profile
 
