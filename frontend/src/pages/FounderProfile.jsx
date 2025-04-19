@@ -30,7 +30,15 @@ const FounderProfile = () => {
   return (
     <div className="max-w-5xl mx-auto p-6 mt-20">
       <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-3xl font-bold mb-6">Founder Dashboard</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold">Founder Dashboard</h2>
+          <button
+            onClick={() => navigate('/founder-dm')}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Go to Direct Messages
+          </button>
+        </div>
 
         {loading ? (
           <p className="text-gray-600">Loading...</p>

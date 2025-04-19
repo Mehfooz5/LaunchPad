@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import API from '../api/axios';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const SignUp = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -25,16 +27,26 @@ const SignUp = () => {
     setSuccessMessage('');
 
     try {
-      const response = await API.post('/signup', formData);
-      setSuccessMessage('Registration successful! Redirecting...');
-
-      setTimeout(() => {
-        if (formData.role === 'founder') {
-          window.location.href = '/signup-founder';
-        } else if (formData.role === 'investor') {
-          window.location.href = '/signup-investor';
+      // Step 4: Send ID token to backend to authorize the request
+      const response = await API.post('/signup', {
+        email: formData.email,
+        fullName: formData.fullName,
+        role: formData.role,
+        contactNo: formData.contactNo,
+        firebaseUID: user.uid,
+      }, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
         }
-      }, 1200);
+      });
+
+      if (response.status === 201) {
+        setSuccessMessage('Registration successful! Redirecting...');
+        // Redirect based on role
+        setTimeout(() => {
+          navigate(formData.role === 'founder' ? '/signup-founder' : '/signup-investor');
+        }, 1000);
+      }
     } catch (err) {
       setError(err?.response?.data?.message || 'Something went wrong');
     } finally {

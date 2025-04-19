@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import API from '../api/axios';
 import { format } from 'date-fns';
 
 const StartupDetail = () => {
   const { startupId } = useParams();
+  const navigate = useNavigate(); // Initialize navigate hook
   const [startup, setStartup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
-  
+
   // New state for comments
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -25,7 +26,7 @@ const StartupDetail = () => {
           API.get(`/getStartupById/${startupId}`),
           API.get(`/comments/${startupId}`)
         ]);
-        
+
         setStartup(startupRes.data.startup);
         setComments(commentsRes.data);
       } catch (err) {
@@ -70,20 +71,6 @@ const StartupDetail = () => {
   };
 
   // New comment handlers
-  // Remove this duplicate useEffect
-useEffect(() => {
-  const fetchComments = async () => {
-    try {
-      const res = await API.get(`/comments/${startupId}`);
-      setComments(res.data);
-    } catch (err) {
-      console.error('Error fetching comments:', err);
-    }
-  };
-  
-  if (startupId) fetchComments();
-}, [startupId]);
-  
   const handleComment = async (e) => {
     e.preventDefault();
     try {
@@ -102,7 +89,7 @@ useEffect(() => {
       const res = await API.post(`/comments/${commentId}/reply`, {
         content: replyText
       });
-      setComments(comments.map(c => 
+      setComments(comments.map(c =>
         c._id === commentId ? res.data : c
       ));
       setReplyText('');
@@ -111,7 +98,14 @@ useEffect(() => {
       console.error('Error posting reply:', err);
     }
   };
-  
+
+  // Chat button click handler
+  const handleChatClick = () => {
+    if (startup && startup.founderId && startup.founderId.userId) {
+      navigate(`/chat/${startup.founderId.userId._id}`); // Navigate to the chat page
+    }
+  };
+ 
   if (loading) return <p>Loading...</p>;
   if (!startup) return <p>Startup not found or you don't have access.</p>;
 
@@ -155,7 +149,16 @@ useEffect(() => {
         </button>
       </div>
 
-      
+      {/* Chat Button */}
+      <div className="mt-4">
+        <button
+          onClick={handleChatClick} // On click navigate to the chat page
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        >
+          Message this Founder
+        </button>
+      </div>
+
       {/* Comment Section */}
       <div className="mt-8 border-t pt-8">
         <h3 className="text-2xl font-bold mb-4">Comments</h3>
