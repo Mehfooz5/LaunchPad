@@ -11,7 +11,7 @@ const ChatBotWidget = () => {
 
   const toggleChat = () => setIsOpen(!isOpen);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
     // Add the new message to the chat
@@ -23,13 +23,30 @@ const ChatBotWidget = () => {
     // Clear the input field
     setNewMessage("");
 
-    // Simulate bot response (replace this with API call if needed)
-    setTimeout(() => {
+    try {
+      // Make an API call to the Flask backend
+      const response = await fetch("http://localhost:5000/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ question: newMessage }),
+      });
+
+      const data = await response.json();
+      const botResponse = data.answer;
+
+      // Add bot response to the chat
       setMessages((prevMessages) => [
         ...prevMessages,
-        { text: "This is a bot response.", type: "bot" },
+        { text: botResponse, type: "bot" },
       ]);
-    }, 1000);
+    } catch (error) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: "Sorry, something went wrong.", type: "bot" },
+      ]);
+    }
   };
 
   const handleKeyDown = (e) => {
