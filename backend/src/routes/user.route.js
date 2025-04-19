@@ -2,7 +2,7 @@ import express from 'express';
 import { verifyToken } from '../middlewares/auth.middleware.js';
 import { createFounderProfile, getMyFounderProfile, updateFounderProfile } from '../controllers/founder.controller.js';
 import { createInvestorProfile, getMyInvestorProfile, updateInvestorProfile } from '../controllers/investor.controller.js';
-import { createStartupProfile, dislikeStartup, getAllStartups, getMyStartupProfile, getStartupById, likeStartup, updateStartupProfile } from '../controllers/startup.controller.js';
+import { createStartupProfile, dislikeStartup, getAllStartups, getMyStartupProfile, getStartupById, likeStartup, updateStartupProfile, saveStartup, getSavedStartups } from '../controllers/startup.controller.js';
 import { upload } from '../utils/multerConfig.js';
 import { getStats } from '../controllers/stats.controller.js';
 import { createComment, getComments, addReply } from '../controllers/comment.controller.js';
@@ -49,5 +49,8 @@ router.post('/startup/like/:id', verifyToken, likeStartup);
 
 
 router.post('/startup/dislike/:id', verifyToken, dislikeStartup);
+
+router.post('/startup/save/:id', verifyToken, saveStartup);
+router.get('/savedStartups', verifyToken, getSavedStartups);
 
 export default router;

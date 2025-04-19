@@ -10,6 +10,7 @@ const StartupDetail = () => {
   const [loading, setLoading] = useState(true);
   const [hasLiked, setHasLiked] = useState(false);
   const [hasDisliked, setHasDisliked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   
   // New state for comments
   const [comments, setComments] = useState([]);
@@ -36,6 +37,19 @@ const StartupDetail = () => {
     };
 
     if (startupId) fetchData();
+  }, [startupId]);
+
+  useEffect(() => {
+    const checkSavedStatus = async () => {
+      try {
+        const res = await API.get(`/startup/isSaved/${startupId}`);
+        setIsSaved(res.data.isSaved);
+      } catch (err) {
+        console.error('Error checking saved status:', err);
+      }
+    };
+
+    if (startupId) checkSavedStatus();
   }, [startupId]);
 
   // Like/Dislike handlers stay the same
@@ -69,21 +83,16 @@ const StartupDetail = () => {
     }
   };
 
-  // New comment handlers
-  // Remove this duplicate useEffect
-useEffect(() => {
-  const fetchComments = async () => {
+  const saveStartup = async () => {
     try {
-      const res = await API.get(`/comments/${startupId}`);
-      setComments(res.data);
+      const res = await API.post(`/startup/save/${startupId}`);
+      setIsSaved(res.data.isSaved);
     } catch (err) {
-      console.error('Error fetching comments:', err);
+      console.error('Error saving startup:', err);
     }
   };
-  
-  if (startupId) fetchComments();
-}, [startupId]);
-  
+
+  // New comment handlers
   const handleComment = async (e) => {
     e.preventDefault();
     try {
@@ -152,6 +161,15 @@ useEffect(() => {
           } text-white hover:opacity-90 transition`}
         >
           <ThumbsDown size={18} /> {hasDisliked ? 'Downvoted' : 'Downvote'} ({startup.dislikes})
+        </button>
+
+        <button
+          onClick={saveStartup}
+          className={`flex items-center gap-2 py-2 px-4 rounded ${
+            isSaved ? 'bg-green-600' : 'bg-green-500'
+          } text-white hover:opacity-90 transition`}
+        >
+          {isSaved ? 'Saved' : 'Save Startup'}
         </button>
       </div>
 

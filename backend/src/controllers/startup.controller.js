@@ -1,5 +1,6 @@
 import { Startup } from '../models/Startup.js';
 import { Founder } from '../models/Founder.js';
+import { Investor } from '../models/Investor.js'; // Import Investor model
 import cloudinary from '../utils/cloudinary.js'; // Import Cloudinary configuration
 
 // @desc Create startup profile
@@ -296,6 +297,46 @@ export const dislikeStartup = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in dislikeStartup:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+export const saveStartup = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user._id;
+
+  try {
+    const investor = await Investor.findOne({ userId });
+    if (!investor) {
+      return res.status(403).json({ message: 'Only investors can save startups' });
+    }
+
+    const isSaved = investor.savedStartups?.includes(id);
+    if (isSaved) {
+      investor.savedStartups = investor.savedStartups.filter((startupId) => startupId.toString() !== id);
+    } else {
+      investor.savedStartups.push(id);
+    }
+
+    await investor.save();
+
+    return res.status(200).json({ isSaved: !isSaved });
+  } catch (error) {
+    console.error('Error in saveStartup:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+export const getSavedStartups = async (req, res) => {
+  try {
+    const investor = await Investor.findOne({ userId: req.user._id }).populate('savedStartups');
+    if (!investor) {
+      return res.status(403).json({ message: 'Only investors can view saved startups' });
+    }
+
+    return res.status(200).json(investor.savedStartups);
+  } catch (error) {
+    console.error('Error in getSavedStartups:', error);
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
