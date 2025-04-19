@@ -4,8 +4,11 @@ import { createFounderProfile, getMyFounderProfile, updateFounderProfile } from 
 import { createInvestorProfile, getMyInvestorProfile, updateInvestorProfile } from '../controllers/investor.controller.js';
 import { createStartupProfile, dislikeStartup, getAllStartups, getMyStartupProfile, getStartupById, likeStartup, updateStartupProfile } from '../controllers/startup.controller.js';
 import { upload } from '../utils/multerConfig.js';
+import { getStats } from '../controllers/stats.controller.js';
 
 const router = express.Router();
+router.get('/stats', getStats);
+
 
 router.post('/createFounderProfile', verifyToken, createFounderProfile);
 router.get('/getMyFounderProfile', verifyToken, getMyFounderProfile);
@@ -25,6 +28,24 @@ router.post('/startup', upload.fields([
   { name: 'pitch', maxCount: 1 }
 ]),verifyToken, createStartupProfile);
 
+router.get('/stats', async (req, res) => {
+  try {
+    const totalStartups = await Startup.countDocuments();
+    const totalInvestors = await Investor.countDocuments();
+    
+    // Count total pitch videos by checking non-null pitch fields
+    const totalPitches = await Startup.countDocuments({ pitch: { $ne: null } });
+
+    res.json({
+      totalStartups,
+      totalPitches,
+      totalInvestors
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching statistics', error: error.message });
+  }
+});
+
 router.get('/getStartups', verifyToken, getAllStartups); // Get current startup profile
 
 router.get('/getMyStartupProfile', verifyToken, getMyStartupProfile);
@@ -37,6 +58,7 @@ router.put('/updateStartupProfile/:startupId', upload.fields([
 ]), verifyToken, updateStartupProfile);
 
 router.post('/startup/like/:id', verifyToken, likeStartup);
+
 
 router.post('/startup/dislike/:id', verifyToken, dislikeStartup);
 

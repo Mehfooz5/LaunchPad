@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { FaUsers, FaBriefcase, FaRocket, FaChartLine, FaHandshake } from "react-icons/fa"
 import { useInView } from "react-intersection-observer"
-
+import API from '../api/axios' // Add this import
 // Stats Counter Animation
 function CounterAnimation({ target, duration = 2 }) {
   const [count, setCount] = useState(0)
@@ -35,12 +35,43 @@ function CounterAnimation({ target, duration = 2 }) {
   return <span ref={ref}>{count}</span>
 }
 
-export default function Home() {
-  const stats = [
-    { value: 120, label: "Startups Launched", icon: <FaRocket /> },
-    { value: 850, label: "Pitches Made", icon: <FaChartLine /> },
-    { value: 300, label: "Investors", icon: <FaHandshake /> },
-  ]
+export default function HomePage() {
+  const [stats, setStats] = useState({
+      TotalFounders: 0,
+      TotalInvestors: 0,
+      TotalStartups: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+      const fetchStats = async () => {
+          try {
+              setLoading(true);
+              const response = await API.get('/stats');
+              
+              if (response.data.success) {
+                  setStats(response.data.data);
+              } else {
+                  throw new Error(response.data.message);
+              }
+          } catch (err) {
+              console.error('Stats fetch error:', err);
+              setError(err.message || 'Failed to load statistics');
+          } finally {
+              setLoading(false);
+          }
+      };
+
+      fetchStats();
+  }, []);
+  const statsData = [
+    { value: stats.TotalFounders, label: "Founders", icon: <FaRocket /> },
+    { value: stats.TotalInvestors, label: "Investors", icon: <FaHandshake /> },
+    { value: stats.TotalStartups, label: "Startups", icon: <FaChartLine /> }
+];
+
+
 
   const pitches = [
     {
@@ -149,38 +180,48 @@ export default function Home() {
         </div>
 
         {/* Stats Section - Simplified */}
-      <div className="py-20 px-6 bg-gradient-to-r from-blue-900 to-purple-900">
-        <div className="container mx-auto">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-purple-300"
-          >
-            Our Success in Numbers
-          </motion.h2>
+        {/* Stats Section */}
+        <section className="py-20 bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+          <div className="container mx-auto px-6">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-3xl md:text-4xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400"
+            >
+              Our Success in Numbers
+            </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {stats.map((s, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white/10 p-8 rounded-2xl shadow-xl border border-white/20 text-center"
-              >
-                <div className="text-4xl mb-4 flex justify-center">{s.icon}</div>
-                <div className="text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-2">
-                  <CounterAnimation target={s.value} />+
-                </div>
-                <div className="text-lg text-blue-100 font-medium">{s.label}</div>
-              </motion.div>
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+              {statsData.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-gray-800 hover:bg-gray-700 transition-all duration-300 rounded-xl shadow-md p-8 text-center border border-blue-500/10"
+                >
+                  <div className="text-5xl text-blue-400 mb-4 flex justify-center">
+                    {stat.icon}
+                  </div>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {loading ? "..." : <CounterAnimation target={stat.value} />}
+                  </div>
+                  <div className="text-lg text-gray-300 font-medium">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
+
+            {error && (
+              <div className="text-red-500 text-center mt-6 text-lg font-medium">
+                {error}
+              </div>
+            )}
           </div>
-        </div>
-      </div>
+        </section>
+
 
       {/* Founders vs Investor s Section - Simplified */}
       <section className="min-h-[500px] flex flex-col justify-center items-center px-6 py-20 bg-gradient-to-b from-gray-800 to-gray-900">

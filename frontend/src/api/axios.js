@@ -1,8 +1,11 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3000/api/v1', // adjust if needed
-  withCredentials: true, // for sending/receiving cookies (like jwt)
+    baseURL: 'http://localhost:3000/api/v1',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json'
+    }
 });
 
 export default API;
