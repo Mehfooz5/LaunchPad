@@ -12,8 +12,10 @@ const InvestorProfile = () => {
     const fetchSavedStartups = async () => {
       try {
         const res = await API.get('/savedStartups');
-        setSavedStartups(res.data);
+        console.log('Saved Startups:', res.data);
+        setSavedStartups(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
+        console.error('Failed to load saved startups:', err);
         setError('Failed to load saved startups');
       } finally {
         setLoading(false);

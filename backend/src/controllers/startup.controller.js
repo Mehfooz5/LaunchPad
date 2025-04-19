@@ -8,31 +8,38 @@ import cloudinary from '../utils/cloudinary.js'; // Import Cloudinary configurat
 export const createStartupProfile = async (req, res) => {
   const { title, domain, stage, location, description } = req.body;
 
-  // Handle PDF file upload (if any)
-  const startupPdf = req.file ? req.file.path : null;
+  // Handle PDF file upload to Cloudinary
+  let startupPdfUrl = null;
+  if (req.files && req.files.startupPdf) {
+    try {
+      const result = await cloudinary.uploader.upload(req.files.startupPdf[0].path, {
+        resource_type: 'raw', // For non-image/video files like PDF
+      });
+      startupPdfUrl = result.secure_url;
+    } catch (error) {
+      return res.status(500).json({ message: 'Error uploading PDF to Cloudinary', error: error.message });
+    }
+  }
 
   // Handle pitch video upload to Cloudinary
   let pitchUrl = null;
   if (req.files && req.files.pitch) {
     try {
-      // Upload pitch video to Cloudinary
       const result = await cloudinary.uploader.upload(req.files.pitch[0].path, {
-        resource_type: 'video', // Specify that it's a video file
+        resource_type: 'video',
       });
-      pitchUrl = result.secure_url; // Store the secure URL from Cloudinary
+      pitchUrl = result.secure_url;
     } catch (error) {
       return res.status(500).json({ message: 'Error uploading pitch video to Cloudinary', error: error.message });
     }
   }
 
   try {
-    // Ensure that the user is associated with a founder profile
     const founder = await Founder.findOne({ userId: req.user._id });
     if (!founder) {
       return res.status(404).json({ message: 'Founder profile not found' });
     }
 
-    // Create new startup profile
     const startup = new Startup({
       founderId: founder._id,
       title,
@@ -40,8 +47,8 @@ export const createStartupProfile = async (req, res) => {
       stage,
       location,
       description,
-      startupPdf, // Store the PDF file path (or Cloudinary URL if uploaded there)
-      pitch: pitchUrl, // Store the Cloudinary URL for pitch video
+      startupPdf: startupPdfUrl,
+      pitch: pitchUrl,
     });
 
     await startup.save();
@@ -55,6 +62,7 @@ export const createStartupProfile = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
 
 // @desc Get current startup profile
 // @route GET /api/startup/me
@@ -301,19 +309,22 @@ export const dislikeStartup = async (req, res) => {
   }
 };
 
+// Toggle Save/Unsave Startup
 export const saveStartup = async (req, res) => {
   const { id } = req.params;
   const userId = req.user._id;
 
   try {
     const investor = await Investor.findOne({ userId });
+
     if (!investor) {
       return res.status(403).json({ message: 'Only investors can save startups' });
     }
 
     const isSaved = investor.savedStartups?.includes(id);
+
     if (isSaved) {
-      investor.savedStartups = investor.savedStartups.filter((startupId) => startupId.toString() !== id);
+      investor.savedStartups = investor.savedStartups.filter(startupId => startupId.toString() !== id);
     } else {
       investor.savedStartups.push(id);
     }
@@ -327,9 +338,19 @@ export const saveStartup = async (req, res) => {
   }
 };
 
+// Get Saved Startups
 export const getSavedStartups = async (req, res) => {
   try {
-    const investor = await Investor.findOne({ userId: req.user._id }).populate('savedStartups');
+    const investor = await Investor.findOne({ userId: req.user._id }).populate({
+      path: 'savedStartups',
+      populate: {
+        path: 'founderId',
+        populate: {
+          path: 'userId', // If founder has reference to User
+        },
+      },
+    });
+
     if (!investor) {
       return res.status(403).json({ message: 'Only investors can view saved startups' });
     }
