@@ -3,13 +3,24 @@ from flask_cors import CORS
 import os
 import google.generativeai as genai
 import re
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Path to your frontend
 frontend_path = r'D:\Hacakthon\EcoCart\frontend\pages'
 
+# Initialize Flask app and CORS
 app = Flask(__name__)
 CORS(app)
 
-api_key = "AIzaSyDtIm6DMPRGOGuToIeycAkLX3xBDMpTAfI"
+# Retrieve API Key from environment variables
+api_key = os.getenv('GOOGLE_API_KEY')
+if not api_key:
+    raise ValueError("API key not found. Please set GOOGLE_API_KEY in your .env file")
+
+# Configure Google Generative AI
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -22,15 +33,18 @@ def ask():
     data = request.get_json()
     question = data.get('question', '')
     try:
+        # Generate response from the model
         response = model.generate_content(question)
         cleaned_response = clean_response(response.text.strip())
         return jsonify({'answer': cleaned_response})
     except Exception as e:
+        # Handle errors more gracefully
         return jsonify({'answer': f"❌ Request error: {str(e)}"})
 
-# 📍 Paste the new clean_response function here
-# Function to clean and structure the response
 def clean_response(text):
+    """
+    Function to clean and structure the response
+    """
     # Remove markdown headers like ## or #
     text = re.sub(r'^#+\s*', '', text, flags=re.MULTILINE)
 
@@ -52,6 +66,6 @@ def clean_response(text):
 
     return text.strip()
 
-
+# Flask server runs in debug mode if not deployed
 if __name__ == '__main__':
     app.run(debug=True)
