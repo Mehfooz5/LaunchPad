@@ -7,8 +7,10 @@ import {
   FaRegClock, FaUserTie, FaLightbulb, FaRocket
 } from 'react-icons/fa';
 import API from '../api/axios';
-import StartupCardSkeleton from '../components/StartupCardSkeleton';
-import EmptyState from '../components/EmptyState';
+// import StartupCards from '../components/StartupCards';
+import EmptyState from '../Components/EmptyState'
+import StartupCardSkeleton from '../Components/StartupCardSkeleton';
+
 
 const FounderProfile = () => {
   const [startups, setStartups] = useState([]);
@@ -264,7 +266,7 @@ const FounderProfile = () => {
                 onClick={() => window.location.reload()} 
                 className="bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition flex items-center mx-auto"
               >
-                <FaRefresh className="mr-2" /> Try Again
+                 Try Again
               </button>
             </div>
           ) : filteredStartups.length === 0 ? (
