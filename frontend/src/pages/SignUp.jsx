@@ -37,47 +37,33 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if passwords match
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords don't match");
-      return;
-    }
-    
     setIsProcessing(true);
     setError('');
     setSuccessMessage('');
-
+  
     try {
-      // Note: The original code has some Firebase auth logic that seems to be missing
-      // This implementation assumes you'll integrate that separately
-      
       const response = await API.post('/signup', {
         email: formData.email,
         fullName: formData.fullName,
+        password: formData.password,
         role: formData.role,
         contactNo: formData.contactNo,
-        // firebaseUID: user.uid, // Commented out as the user object isn't defined in the original
-      }, {
-        // headers: {
-        //   Authorization: `Bearer ${idToken}`, // Commented out as idToken isn't defined in the original
-        // }
       });
-
+      console.log(response.data);  // Log response data
       if (response.status === 201) {
         setSuccessMessage('Registration successful! Redirecting...');
-        // Redirect based on role
         setTimeout(() => {
           navigate(formData.role === 'founder' ? '/signup-founder' : '/signup-investor');
         }, 1500);
       }
     } catch (err) {
+      console.error('Error:', err?.response?.data || err);
       setError(err?.response?.data?.message || 'Something went wrong');
     } finally {
       setIsProcessing(false);
     }
   };
-
+  
   // Move to next step in the multi-step form
   const nextStep = () => {
     setStep(step + 1);

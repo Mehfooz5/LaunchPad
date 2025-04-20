@@ -8,7 +8,7 @@ const SignupInvestor = () => {
   const [formData, setFormData] = useState({
     organizationName: '',
     bio: '',
-    type: 'Angel',
+    type: 'Angel', // Note: correct key is "type", not "role"
     preferredDomain: '',
     linkedin: '',
   });
@@ -23,21 +23,22 @@ const SignupInvestor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
     setSuccessMessage('');
+    setIsSubmitting(true);
 
     try {
       const response = await API.post('/createInvestorProfile', formData);
-      
-      if (response.status === 200 || response.status === 201) {
-        setSuccessMessage('Investor details submitted successfully!');
-        navigate('/investor-profile');
-      } else {
-        setError('Unexpected server response.');
+
+      if (response.status === 201) {
+        setSuccessMessage('Investor profile created successfully!');
+        navigate('/investor-profile'); // Optional redirect
+
       }
+      navigate('/investor-profile'); // Optional redirect
     } catch (err) {
-      setError(err?.response?.data?.message || 'Something went wrong.');
+      setError(err.response?.data?.message || 'Something went wrong');
+      console.error('Error creating investor profile:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -48,7 +49,6 @@ const SignupInvestor = () => {
       <div className="bg-white/10 backdrop-blur-md shadow-xl rounded-xl w-full max-w-lg p-8 border border-white/20 text-white">
         <h2 className="text-3xl font-bold text-center mb-6">Investor Details</h2>
 
-        {/* Success or Error Message */}
         {error && (
           <div className="bg-red-500/10 text-red-200 border border-red-300 px-4 py-2 rounded mb-4 text-center">
             {error}
@@ -90,11 +90,12 @@ const SignupInvestor = () => {
           <div>
             <label className="block mb-1">Investor Type</label>
             <select
-              name="role"
-              value={formData.role}
+              name="type"
+              value={formData.type}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none focus:ring-2 focus:ring-pink-300">
+              className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none focus:ring-2 focus:ring-pink-300"
+            >
               <option className="text-black" value="Angel">Angel</option>
               <option className="text-black" value="VC">VC</option>
               <option className="text-black" value="Institutional">Institutional</option>
@@ -102,7 +103,6 @@ const SignupInvestor = () => {
               <option className="text-black" value="Other">Other</option>
             </select>
           </div>
-          
 
           <div>
             <label className="block mb-1">Preferred Domain</label>

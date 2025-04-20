@@ -52,7 +52,7 @@ const FounderProfile = () => {
   };
 
   const handleCreateStartup = () => {
-    navigate('/create-startup');
+    navigate('/add-startup');
   };
 
   const handleShare = async (startup) => {

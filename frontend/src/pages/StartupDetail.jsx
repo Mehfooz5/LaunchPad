@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ThumbsUp, ThumbsDown, MessageCircle, Send, Bookmark } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, MessageCircle, Send, Bookmark, FileText } from 'lucide-react';
 import API from '../api/axios';
 
 const StartupDetail = () => {
@@ -15,7 +15,9 @@ const StartupDetail = () => {
   const [newComment, setNewComment] = useState('');
   const [replyContent, setReplyContent] = useState({});
   const [showReplyField, setShowReplyField] = useState({});
-  const [userRole, setUserRole] = useState(null); // New
+  const [userRole, setUserRole] = useState(null);
+  const [error, setError] = useState(null);
+  const [summary, setSummary] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,16 +32,14 @@ const StartupDetail = () => {
         setUserRole(role);
 
         let isStartupSaved = false;
-        if (role === 'investor') {
-          try {
-            const savedRes = await API.get('/savedStartups');
-            isStartupSaved = savedRes.data.some((s) => s._id === startupId);
-          } catch (err) {
-            if (err.response?.status === 403) {
-              console.warn('Saved startups fetch forbidden. Possibly user not authenticated.');
-            } else {
-              console.error('Error fetching saved startups:', err);
-            }
+        try {
+          const savedRes = await API.get('/savedStartups');
+          isStartupSaved = savedRes.data.some((s) => s._id === startupId);
+        } catch (err) {
+          if (err.response?.status === 403) {
+            console.warn('Saved startups fetch forbidden. Possibly user not authenticated.');
+          } else {
+            console.error('Error fetching saved startups:', err);
           }
         }
 
@@ -50,6 +50,7 @@ const StartupDetail = () => {
         setComments(commentsRes.data || []);
       } catch (err) {
         console.error('Error fetching data:', err);
+        setError('Failed to load startup details');
       } finally {
         setLoading(false);
       }
@@ -94,6 +95,10 @@ const StartupDetail = () => {
       setIsSaved(res.data.isSaved);
     } catch (error) {
       console.error('Error saving startup:', error);
+      // If the user is not an investor, show an error message
+      if (error.response?.status === 403) {
+        alert('Only investors can save startups');
+      }
     }
   };
 
@@ -149,8 +154,18 @@ const StartupDetail = () => {
     navigate(`/chat/${startupId}`);
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!startup) return <p>Startup not found or access denied.</p>;
+  const fetchSummary = async () => {
+    try {
+      const res = await API.get(`http://127.0.0.1:5000/startup/ask/${startupId}`);
+      setSummary(res.data.summary);
+    } catch (error) {
+      console.error('Error fetching summary:', error);
+    }
+  };
+
+  if (loading) return <p className="text-center p-6 mt-14">Loading startup details...</p>;
+  if (error) return <p className="text-center p-6 mt-14 text-red-500">{error}</p>;
+  if (!startup) return <p className="text-center p-6 mt-14">Startup not found or access denied.</p>;
 
   return (
     <div className="p-6 mt-14 max-w-4xl mx-auto bg-white rounded-xl shadow-md">
@@ -166,24 +181,30 @@ const StartupDetail = () => {
       <p className="text-gray-700 mb-4"><strong>Location:</strong> {startup.location}</p>
       <p className="text-gray-600 mb-6">{startup.description}</p>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-4 mb-6">
         <button onClick={likeStartup} className={`flex items-center gap-2 py-2 px-4 rounded ${hasLiked ? 'bg-blue-600' : 'bg-blue-500'} text-white`}>
           <ThumbsUp size={18} /> {hasLiked ? 'Upvoted' : 'Upvote'} ({startup.likes || 0})
         </button>
         <button onClick={dislikeStartup} className={`flex items-center gap-2 py-2 px-4 rounded ${hasDisliked ? 'bg-red-600' : 'bg-red-500'} text-white`}>
           <ThumbsDown size={18} /> {hasDisliked ? 'Downvoted' : 'Downvote'} ({startup.dislikes || 0})
         </button>
+        <button onClick={toggleSaveStartup} className={`flex items-center gap-2 py-2 px-4 rounded ${isSaved ? 'bg-yellow-600' : 'bg-yellow-500'} text-white`}>
+          <Bookmark size={18} /> {isSaved ? 'Saved' : 'Save'}
+        </button>
         <button onClick={goToChatPage} className="flex items-center gap-2 py-2 px-4 rounded bg-green-500 text-white">
           <MessageCircle size={18} /> Go to Chat
         </button>
-
-        {/* Conditionally render save button for investors only */}
-        {userRole === 'investor' && (
-          <button onClick={toggleSaveStartup} className={`flex items-center gap-2 py-2 px-4 rounded ${isSaved ? 'bg-yellow-500' : 'bg-gray-500'} text-white`}>
-            <Bookmark size={18} /> {isSaved ? 'Saved' : 'Save'}
-          </button>
-        )}
+        <button onClick={fetchSummary} className="flex items-center gap-2 py-2 px-4 rounded bg-purple-500 text-white">
+          <FileText size={18} /> Get Summary
+        </button>
       </div>
+
+      {summary && (
+        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+          <h3 className="text-xl font-semibold">Summary</h3>
+          <p>{summary}</p>
+        </div>
+      )}
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold">Founder:</h3>

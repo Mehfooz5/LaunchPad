@@ -1,11 +1,11 @@
-"use client"
-import React , { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import API from "../api/axios";
 import {
   FaRocket,
   FaFileUpload,
   FaVideo,
-  FaMapMarkerAlt,
+  FaMapMarkerAlt,  // <-- Make sure this line is added
   FaLaptopCode,
   FaGraduationCap,
   FaBuilding,
@@ -19,7 +19,9 @@ import {
   FaChevronLeft,
   FaRegFilePdf,
   FaRegFileVideo,
-} from "react-icons/fa"
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -28,8 +30,8 @@ const fadeIn = {
     y: 0,
     transition: { duration: 0.4, ease: "easeOut" },
   },
-  exit: { opacity: 0, y: -20 }
-}
+  exit: { opacity: 0, y: -20 },
+};
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -39,9 +41,10 @@ const staggerContainer = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
-const AddStartup = () => {
+const AddStartup = ({ startupId }) => {
+  const Navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     domain: "tech",
@@ -50,64 +53,107 @@ const AddStartup = () => {
     description: "",
     startupPdf: null,
     pitch: null,
-  })
+  });
 
-  const [error, setError] = useState("")
-  const [successMessage, setSuccessMessage] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [activeSection, setActiveSection] = useState("basic")
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeSection, setActiveSection] = useState("basic");
+
+  // Fetch the existing startup data when the component is mounted (if editing an existing profile)
+  useEffect(() => {
+    if (startupId) {
+      axios.get(`/startup/${startupId}`)
+        .then((response) => {
+          setFormData(response.data);  // Assuming response contains the startup data
+        })
+        .catch((err) => {
+          setError("Failed to fetch startup data.");
+        });
+    }
+  }, [startupId]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target
+    const { name, value, files } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError("")
-    setSuccessMessage("")
-
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+    setSuccessMessage("");
+  
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      setSuccessMessage("Startup submitted successfully!")
-      console.log("Form data:", formData)
+      // Construct FormData object to handle file uploads
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (formData[key]) formDataToSend.append(key, formData[key]);
+      });
+  
+      // Always POST to /startup (no need to use PUT or conditional URLs)
+      const url = "/startup";
+  
+      const response = await API.post(url, formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      
+      if (response.status === 201) {
+        setSuccessMessage("Startup profile submitted successfully!");
+        Navigate("/founder-profile");  // Redirect to founder profile page
+      } else {
+        throw new Error("Error in backend response");
+      }
     } catch (err) {
-      setError("An error occurred while submitting. Please try again.")
+      setError("An error occurred while submitting. Please try again.");
+      console.error("Error in submitting form:", err);  // Log error for debugging
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
+  
+  
 
   const getDomainIcon = (domain) => {
     switch (domain) {
-      case "tech": return <FaLaptopCode className="text-blue-500" />
-      case "education": return <FaGraduationCap className="text-green-500" />
-      case "medical": return <FaHeartbeat className="text-red-500" />
-      case "agriculture": return <FaLeaf className="text-green-600" />
-      default: return <FaBuilding className="text-gray-500" />
+      case "tech":
+        return <FaLaptopCode className="text-blue-500" />;
+      case "education":
+        return <FaGraduationCap className="text-green-500" />;
+      case "medical":
+        return <FaHeartbeat className="text-red-500" />;
+      case "agriculture":
+        return <FaLeaf className="text-green-600" />;
+      default:
+        return <FaRocket className="text-gray-500" />;
     }
-  }
+  };
 
   const getStageIcon = (stage) => {
     switch (stage) {
-      case "Idea": return <FaLightbulb className="text-yellow-500" />
-      case "Prototype": return <FaRocket className="text-orange-500" />
-      case "MVP": return <FaRocket className="text-blue-500" />
-      case "Revenue": return <FaChartLine className="text-green-500" />
-      default: return <FaLightbulb className="text-yellow-500" />
+      case "Idea":
+        return <FaLightbulb className="text-yellow-500" />;
+      case "Prototype":
+        return <FaRocket className="text-orange-500" />;
+      case "MVP":
+        return <FaRocket className="text-blue-500" />;
+      case "Revenue":
+        return <FaChartLine className="text-green-500" />;
+      default:
+        return <FaLightbulb className="text-yellow-500" />;
     }
-  }
+  };
 
   const sections = [
     { id: "basic", title: "Basic Info", icon: "1" },
     { id: "details", title: "Details", icon: "2" },
-    { id: "uploads", title: "Uploads", icon: "3" }
-  ]
+    { id: "uploads", title: "Uploads", icon: "3" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">

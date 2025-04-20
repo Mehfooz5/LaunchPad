@@ -37,33 +37,25 @@ function App() {
         <Route
           path="/founder-profile"
           element={
-            <ProtectedRoute>
               <FounderProfile />
-            </ProtectedRoute>
           }
         />
         <Route
           path="/investor-profile"
           element={
-            <ProtectedRoute>
               <InvestorProfile />
-            </ProtectedRoute>
           }
         />
         <Route
           path="/add-startup"
           element={
-            <ProtectedRoute>
               <AddStartup />
-            </ProtectedRoute>
           }
         />
         <Route
           path="/update-startup/:startupId"
           element={
-            <ProtectedRoute>
               <UpdateStartup />
-            </ProtectedRoute>
           }
         />
         <Route path="/founder-dm" element={<FounderDMPage />} />
