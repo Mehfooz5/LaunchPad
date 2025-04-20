@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa"
 
 const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
@@ -25,7 +25,7 @@ const staggerContainer = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.15,
     },
   },
 }
@@ -33,34 +33,31 @@ const staggerContainer = {
 const AboutUs = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-16 px-6 lg:px-24">
-      <motion.div initial="hidden" animate="visible" variants={fadeIn} className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden mb-10">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-3"></div>
+      <motion.div initial="hidden" animate="visible" variants={fadeIn} className="max-w-5xl mx-auto">
+
+        {/* Header */}
+        <div className="bg-white/80 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden mb-12">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-1.5"></div>
           <div className="p-10">
-            <div className="flex justify-center mb-8">
-              <div className="bg-blue-100 p-4 rounded-full">
+            <div className="flex justify-center mb-6">
+              <div className="bg-blue-100 p-4 rounded-full shadow-md">
                 <FaRocket className="text-blue-600 text-4xl" />
               </div>
             </div>
-            <h1 className="text-4xl font-bold text-center text-gray-800 mb-4">
-              About <span className="text-blue-600">LaunchPad</span>
+            <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-2">
+              About <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-500">LaunchPad</span>
             </h1>
-            <div className="w-20 h-1 bg-blue-600 mx-auto mb-8"></div>
-
-            <motion.p
-              variants={fadeIn}
-              className="text-lg text-gray-700 mb-6 leading-relaxed text-center max-w-2xl mx-auto"
-            >
+            <div className="w-16 h-1 bg-blue-600 mx-auto rounded-full mb-6"></div>
+            <p className="text-center text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
               Welcome to <span className="font-semibold text-blue-600">LaunchPad</span>, your gateway to the startup
-              ecosystem! We are a platform built to <span className="font-medium">empower founders</span> and connect
-              them with potential investors, mentors, and early adopters.
-            </motion.p>
+              ecosystem. We empower <strong>founders</strong>, connect them with <strong>investors</strong>, and provide
+              the tools to build the future.
+            </p>
           </div>
         </div>
 
-        {/* Mission Section */}
-        <motion.div variants={fadeIn} className="bg-white shadow-lg rounded-2xl p-8 mb-10 border-l-4 border-blue-600">
+        {/* Mission */}
+        <motion.div variants={fadeIn} className="bg-white/70 backdrop-blur-md shadow-md rounded-2xl p-8 mb-12 border-l-4 border-blue-500/60">
           <div className="flex items-center mb-4">
             <FaStar className="text-yellow-500 text-2xl mr-3" />
             <h2 className="text-2xl font-semibold text-gray-800">Our Mission</h2>
@@ -71,124 +68,75 @@ const AboutUs = () => {
           </p>
         </motion.div>
 
-        {/* What We Do Section */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="bg-white shadow-lg rounded-2xl p-8 mb-10"
-        >
+        {/* What We Do */}
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="bg-white/70 backdrop-blur-md shadow-lg rounded-2xl p-10 mb-12">
           <div className="flex items-center mb-6">
             <FaLightbulb className="text-blue-600 text-2xl mr-3" />
             <h2 className="text-2xl font-semibold text-gray-800">What We Do</h2>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-6 pl-2">
-            <motion.div variants={fadeIn} className="flex items-start">
-              <div className="bg-blue-100 p-2 rounded-lg mr-4 mt-1">
-                <FaCheckCircle className="text-blue-600 text-lg" />
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-800 mb-1">Showcase Startups</h3>
-                <p className="text-gray-600 text-sm">Detailed profiles and video pitches</p>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn} className="flex items-start">
-              <div className="bg-blue-100 p-2 rounded-lg mr-4 mt-1">
-                <FaCheckCircle className="text-blue-600 text-lg" />
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-800 mb-1">Investor Exploration</h3>
-                <p className="text-gray-600 text-sm">Help investors find high-potential startups</p>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn} className="flex items-start">
-              <div className="bg-blue-100 p-2 rounded-lg mr-4 mt-1">
-                <FaCheckCircle className="text-blue-600 text-lg" />
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-800 mb-1">Smart Matchmaking</h3>
-                <p className="text-gray-600 text-sm">Connect startups with the right investors</p>
-              </div>
-            </motion.div>
-
-            <motion.div variants={fadeIn} className="flex items-start">
-              <div className="bg-blue-100 p-2 rounded-lg mr-4 mt-1">
-                <FaCheckCircle className="text-blue-600 text-lg" />
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-800 mb-1">Full-Stage Support</h3>
-                <p className="text-gray-600 text-sm">From idea to revenue generation</p>
-              </div>
-            </motion.div>
+          <div className="grid md:grid-cols-2 gap-6 mt-4">
+            {[
+              ["Showcase Startups", "Detailed profiles and video pitches"],
+              ["Investor Exploration", "Help investors find high-potential startups"],
+              ["Smart Matchmaking", "Connect startups with the right investors"],
+              ["Full-Stage Support", "From idea to revenue generation"],
+            ].map(([title, desc], i) => (
+              <motion.div variants={fadeIn} key={i} className="flex items-start space-x-4">
+                <div className="bg-blue-100 p-3 rounded-lg mt-1">
+                  <FaCheckCircle className="text-blue-600 text-lg" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-800 mb-1">{title}</h3>
+                  <p className="text-gray-600 text-sm">{desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 
-        {/* Who We Serve Section */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="bg-white shadow-lg rounded-2xl p-8 mb-10"
-        >
+        {/* Who We Serve */}
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="bg-white/70 backdrop-blur-md shadow-lg rounded-2xl p-10 mb-12">
           <div className="flex items-center mb-6">
             <FaUsers className="text-blue-600 text-2xl mr-3" />
             <h2 className="text-2xl font-semibold text-gray-800">Who We Serve</h2>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <motion.div
-              variants={fadeIn}
-              className="bg-gradient-to-b from-white to-blue-50 p-6 rounded-xl shadow-sm text-center hover:shadow-md transition-shadow"
-            >
-              <div className="bg-blue-100 p-3 rounded-full inline-flex justify-center items-center mb-4">
-                <FaRocket className="text-blue-600 text-xl" />
-              </div>
-              <h3 className="font-medium text-gray-800 mb-2">Founders</h3>
-              <p className="text-gray-600 text-sm">Students, professionals, and innovative thinkers</p>
-            </motion.div>
-
-            <motion.div
-              variants={fadeIn}
-              className="bg-gradient-to-b from-white to-blue-50 p-6 rounded-xl shadow-sm text-center hover:shadow-md transition-shadow"
-            >
-              <div className="bg-blue-100 p-3 rounded-full inline-flex justify-center items-center mb-4">
-                <FaChartLine className="text-blue-600 text-xl" />
-              </div>
-              <h3 className="font-medium text-gray-800 mb-2">Investors</h3>
-              <p className="text-gray-600 text-sm">Angels, VCs, and investment institutions</p>
-            </motion.div>
-
-            <motion.div
-              variants={fadeIn}
-              className="bg-gradient-to-b from-white to-blue-50 p-6 rounded-xl shadow-sm text-center hover:shadow-md transition-shadow"
-            >
-              <div className="bg-blue-100 p-3 rounded-full inline-flex justify-center items-center mb-4">
-                <FaGraduationCap className="text-blue-600 text-xl" />
-              </div>
-              <h3 className="font-medium text-gray-800 mb-2">Mentors & Incubators</h3>
-              <p className="text-gray-600 text-sm">Guides and supporters for growing startups</p>
-            </motion.div>
+          <div className="grid md:grid-cols-3 gap-6 mt-6">
+            {[
+              ["Founders", "Students, professionals, and innovative thinkers", FaRocket],
+              ["Investors", "Angels, VCs, and investment institutions", FaChartLine],
+              ["Mentors & Incubators", "Guides and supporters for growing startups", FaGraduationCap],
+            ].map(([title, desc, Icon], i) => (
+              <motion.div
+                variants={fadeIn}
+                key={i}
+                className="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl text-center shadow-sm hover:shadow-md transition-all border border-blue-100"
+              >
+                <div className="bg-blue-100 p-3 rounded-full inline-flex mb-4 shadow-sm">
+                  <Icon className="text-blue-600 text-xl" />
+                </div>
+                <h3 className="font-semibold text-gray-800 mb-1">{title}</h3>
+                <p className="text-gray-600 text-sm">{desc}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 
-        {/* Call to Action */}
+        {/* Call To Action */}
         <motion.div
           variants={fadeIn}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-8 text-center text-white"
+          className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-10 text-center text-white"
         >
-          <FaHandshake className="text-white text-3xl mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Join us in shaping the future of innovation</h2>
-          <p className="mb-6 opacity-90">Let's build, back, and bring ideas to life.</p>
-          <motion.button
+          <FaHandshake className="text-white text-3xl mx-auto mb-4 animate-pulse" />
+          <h2 className="text-2xl font-bold mb-3">Join us in shaping the future of innovation</h2>
+          <p className="opacity-90 mb-6">Let's build, back, and bring ideas to life.</p>
+          <motion.a
+            href="/login"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-white text-blue-600 font-medium py-3 px-8 rounded-full shadow-md hover:shadow-lg transition-shadow"
+            className="bg-white text-blue-600 font-semibold py-3 px-8 rounded-full shadow-md hover:shadow-lg transition"
           >
             Get Started
-          </motion.button>
+          </motion.a>
         </motion.div>
       </motion.div>
     </div>
