@@ -7,14 +7,12 @@ import requests
 import tempfile
 from PyPDF2 import PdfReader
 from dotenv import load_dotenv
+import base64
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
-# Path to your frontend
-frontend_path = r'D:\projects\LaunchPad\frontend\src\pages'  # Ensure this path is correct
-
-# Initialize Flask app and CORS
+# Initialize Flask app
 app = Flask(__name__)
 CORS(app)
 
@@ -31,63 +29,82 @@ def generate_signed_url():
     file_url = request.args.get('fileName')
     if not file_url:
         return jsonify({'error': 'No file URL provided'}), 400
-    
     try:
-        # For direct download, just return the URL itself
-        # In a production environment, you might want to generate actual signed URLs
-        # with expiration for security if using a cloud provider like AWS or GCP
         return jsonify({'signedUrl': file_url})
     except Exception as e:
         return jsonify({'error': f'Error generating signed URL: {str(e)}'}), 500
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    data = request.get_json()
-    print("Received Data:", data)  # Log the received data
+    # Handle both JSON and form-data
+    if request.is_json:
+        data = request.get_json()
+        question = data.get('question')
+        pdf_base64 = data.get('pdfBase64')
+        pdf_url = data.get('pdfUrl')
+    else:
+        question = request.form.get('question')
+        pdf_url = request.form.get('pdfUrl')
+        pdf_base64 = None
+        if 'pdf' in request.files:
+            pdf_file = request.files['pdf']
+            pdf_base64 = base64.b64encode(pdf_file.read()).decode('utf-8')
 
-    pdf_url = data.get("pdfUrl")  # Make sure this matches your frontend key name
-
-    if not pdf_url:
-        return jsonify({'summary': "❌ PDF URL is missing"}), 400
+    if not question:
+        return jsonify({'answer': "Question is required"}), 400
 
     try:
-        # Download PDF from Cloudinary URL
-        pdf_response = requests.get(pdf_url)
-        pdf_response.raise_for_status()
-
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
-            tmp_file.write(pdf_response.content)
-            tmp_file_path = tmp_file.name
-
-        # Extract text from PDF
-        reader = PdfReader(tmp_file_path)
         pdf_text = ""
-        for page in reader.pages:
-            pdf_text += page.extract_text() or ""
+        tmp_file_path = None
+        
+        # Handle PDF from base64
+        if pdf_base64:
+            pdf_bytes = base64.b64decode(pdf_base64)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                tmp_file.write(pdf_bytes)
+                tmp_file_path = tmp_file.name
+            
+            reader = PdfReader(tmp_file_path)
+            for page in reader.pages:
+                pdf_text += page.extract_text() or ""
+        
+        # Handle PDF from URL
+        elif pdf_url:
+            pdf_response = requests.get(pdf_url)
+            pdf_response.raise_for_status()
+            
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                tmp_file.write(pdf_response.content)
+                tmp_file_path = tmp_file.name
+            
+            reader = PdfReader(tmp_file_path)
+            for page in reader.pages:
+                pdf_text += page.extract_text() or ""
 
-        if not pdf_text.strip():
-            return jsonify({'summary': "❌ No text found in PDF."})
+        # Generate response
+        prompt = f"Question: {question}\n\n"
+        if pdf_text.strip():
+            prompt += f"Document Content:\n{pdf_text}\n\nPlease answer based on the document."
+        else:
+            prompt += "Please answer based on your general knowledge."
 
-        # Summarize using Gemini
-        gemini_response = model.generate_content(f"Summarize this PDF content:\n\n{pdf_text}")
-        cleaned = clean_response(gemini_response.text.strip())
+        response = model.generate_content(prompt)
+        cleaned = clean_response(response.text.strip())
 
-        return jsonify({'summary': cleaned})
+        return jsonify({
+            'answer': cleaned,
+            'sources': pdf_url if pdf_url else None
+        })
 
     except Exception as e:
-        return jsonify({'summary': f"❌ Error processing PDF: {str(e)}"}), 500
+        return jsonify({'answer': f"Error processing request: {str(e)}"}), 500
     finally:
-        # Clean up temporary file
-        if 'tmp_file_path' in locals() and os.path.exists(tmp_file_path):
+        if tmp_file_path and os.path.exists(tmp_file_path):
             os.unlink(tmp_file_path)
 
 def clean_response(text):
-    """
-    Cleans and structures the AI response text.
-    """
+    """Clean and format the AI response"""
     text = re.sub(r'^#+\s*', '', text, flags=re.MULTILINE)
-    text = re.sub(r'(?<!^)\s*(At Home:|Transportation:|Shopping & Consumption:|Other:)', r'\n\n\1', text)
-    text = re.sub(r'^\s*[\*\-]\s+', r'\n- ', text, flags=re.MULTILINE)
     text = re.sub(r'\*+', '', text)
     text = re.sub(r'<.*?>', '', text)
     text = re.sub(r'\n{2,}', '\n\n', text)
@@ -95,4 +112,4 @@ def clean_response(text):
     return text.strip()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

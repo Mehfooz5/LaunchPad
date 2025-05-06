@@ -7,25 +7,28 @@ import {
   FaPaperPlane, 
   FaTimes, 
   FaRobot, 
-  FaUser 
+  FaUser,
+  FaFilePdf
 } from "react-icons/fa";
 
 const ChatBotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { text: "Hi there! How can I help you with your startup journey today?", type: "bot" }
+    { text: "Hi there! I'm your LaunchPad assistant. How can I help you with your startup today?", type: "bot" }
   ]);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState("");
   const location = useLocation();
   const isHomePage = location.pathname === "/";
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatWindowRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
-    // Focus input when opening
     if (!isOpen) {
       setTimeout(() => {
         inputRef.current?.focus();
@@ -33,52 +36,82 @@ const ChatBotWidget = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPdfFile(file);
+      // For demo purposes, we'll just show the filename
+      // In a real app, you would upload this to your server/Cloudinary
+      setPdfUrl(file.name);
+      setMessages(prev => [...prev, {
+        text: `PDF attached: ${file.name}`,
+        type: "system",
+        isPdf: true
+      }]);
+    }
+  };
+
+  const removePdf = () => {
+    setPdfFile(null);
+    setPdfUrl("");
+  };
   const sendMessage = async () => {
-    if (!newMessage.trim()) return;
-
-    // Add the new message to the chat
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { text: newMessage, type: "user" },
-    ]);
-
-    // Clear the input field
+    if (!newMessage.trim() && !pdfFile) return;
+  
+    // Add user message to chat
+    const userMessage = { text: newMessage, type: "user" };
+    setMessages(prev => [...prev, userMessage]);
     setNewMessage("");
-    
-    // Show typing indicator
     setIsTyping(true);
-
+  
     try {
-      // Make an API call to the Flask backend
+      // Convert PDF file to base64 if present
+      let pdfBase64 = null;
+      if (pdfFile) {
+        pdfBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.readAsDataURL(pdfFile);
+        });
+      }
+  
+      const requestBody = {
+        question: newMessage,
+        pdfBase64: pdfBase64,
+        pdfUrl: pdfUrl
+      };
+  
       const response = await fetch("http://127.0.0.1:5000/ask", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ question: newMessage }),
+        body: JSON.stringify(requestBody),
       });
-
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
       const data = await response.json();
-      const botResponse = data.answer;
-
-      // Simulate a small delay for natural feeling
+      const botResponse = data.summary || data.answer || "I couldn't process that request.";
+  
       setTimeout(() => {
-        // Hide typing indicator
         setIsTyping(false);
-        
-        // Add bot response to the chat
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: botResponse, type: "bot" },
-        ]);
+        setMessages(prev => [...prev, { 
+          text: botResponse, 
+          type: "bot" 
+        }]);
       }, 700);
+      
     } catch (error) {
+      console.error("Error sending message:", error);
       setTimeout(() => {
         setIsTyping(false);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: "Sorry, I'm having trouble connecting right now. Please try again later.", type: "bot" },
-        ]);
+        setMessages(prev => [...prev, { 
+          text: `Sorry, I encountered an error (${error.message}). Please try again.`, 
+          type: "bot" 
+        }]);
       }, 700);
     }
   };
@@ -90,7 +123,7 @@ const ChatBotWidget = () => {
     }
   };
 
-  // Auto-scroll to the bottom when messages change
+  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
@@ -98,7 +131,8 @@ const ChatBotWidget = () => {
   // Close chat when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isOpen && chatWindowRef.current && !chatWindowRef.current.contains(event.target) && 
+      if (isOpen && chatWindowRef.current && 
+          !chatWindowRef.current.contains(event.target) && 
           !event.target.closest('.chat-toggle-button')) {
         setIsOpen(false);
       }
@@ -120,27 +154,6 @@ const ChatBotWidget = () => {
       >
         <FaComments className="text-xl" />
       </motion.button>
-
-      {/* "Chat with Agent" Popup (Home Page Only) */}
-      <AnimatePresence>
-        {isHomePage && !isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed bottom-24 right-6 bg-gray-900 text-white p-4 rounded-lg shadow-lg z-50 border border-gray-800"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-1 rounded">
-                <FaRobot className="text-white text-sm" />
-              </div>
-              <p className="font-medium">Need assistance?</p>
-            </div>
-            <p className="text-sm text-gray-300">Chat with our AI assistant!</p>
-            <div className="absolute -bottom-2 right-5 w-4 h-4 bg-gray-900 border-r border-b border-gray-800 transform rotate-45"></div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Chat Window */}
       <AnimatePresence>
@@ -189,6 +202,8 @@ const ChatBotWidget = () => {
                     className={`p-3 rounded-2xl max-w-[80%] ${
                       msg.type === "user"
                         ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-tr-none"
+                        : msg.type === "system"
+                        ? "bg-gray-700 text-gray-300 rounded-tl-none"
                         : "bg-gray-800 text-gray-100 rounded-tl-none border border-gray-700"
                     }`}
                   >
@@ -198,7 +213,15 @@ const ChatBotWidget = () => {
                           <FaRobot className="text-xs text-white" />
                         </div>
                       )}
-                      <div className="flex-1">{msg.text}</div>
+                      <div className="flex-1">
+                        {msg.text}
+                        {msg.isPdf && (
+                          <div className="flex items-center mt-2 text-blue-300">
+                            <FaFilePdf className="mr-2" />
+                            <span className="text-sm">{msg.text.replace('PDF attached: ', '')}</span>
+                          </div>
+                        )}
+                      </div>
                       {msg.type === "user" && (
                         <div className="bg-purple-500 p-1 rounded-full mt-1">
                           <FaUser className="text-xs text-white" />
@@ -209,7 +232,6 @@ const ChatBotWidget = () => {
                 </motion.div>
               ))}
               
-              {/* Typing indicator */}
               {isTyping && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -236,23 +258,53 @@ const ChatBotWidget = () => {
             
             {/* Input Area */}
             <div className="p-4 border-t border-gray-800 bg-gray-900">
+              {pdfFile && (
+                <div className="flex items-center justify-between mb-2 p-2 bg-gray-800 rounded-lg">
+                  <div className="flex items-center text-blue-300">
+                    <FaFilePdf className="mr-2" />
+                    <span className="text-sm truncate max-w-xs">{pdfFile.name}</span>
+                  </div>
+                  <button 
+                    onClick={removePdf}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              )}
+              
               <div className="flex gap-2 items-center">
+                <button 
+                  onClick={() => fileInputRef.current.click()}
+                  className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
+                  title="Attach PDF"
+                >
+                  <FaFilePdf />
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept=".pdf"
+                  className="hidden"
+                />
+                
                 <input
                   ref={inputRef}
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type your message..."
+                  placeholder={pdfFile ? "Ask about the PDF..." : "Type your message..."}
                   className="flex-1 px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <motion.button
                   onClick={sendMessage}
-                  disabled={!newMessage.trim()}
+                  disabled={!newMessage.trim() && !pdfFile}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className={`bg-gradient-to-r ${
-                    newMessage.trim() 
+                    (newMessage.trim() || pdfFile)
                       ? "from-blue-500 to-purple-600 hover:shadow-blue-500/20" 
                       : "from-gray-600 to-gray-700"
                   } text-white p-3 rounded-lg transition-all`}
@@ -263,7 +315,7 @@ const ChatBotWidget = () => {
               </div>
               <div className="mt-2 text-center">
                 <span className="text-xs text-gray-500">
-                  Powered by LaunchPad AI
+                  Powered by Gemini AI
                 </span>
               </div>
             </div>
