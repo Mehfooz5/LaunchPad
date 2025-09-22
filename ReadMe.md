@@ -26,7 +26,7 @@ Other Tools: Cloudinary (media uploads), Socket.IO (real-time)
 
 🚀 Getting Started
 1️⃣ Clone the Repository
-git clone https://github.com/your-username/launchpad.git
+git clone https://github.com/Mehfooz5/launchpad.git
 cd launchpad
 
 2️⃣ Install Dependencies
