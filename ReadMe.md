@@ -1,5 +1,3 @@
-Here’s a ready-to-use `README.md` file for your **LaunchPad 🚀** project:
-
 ***
 
 # LaunchPad 🚀  
